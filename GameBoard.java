@@ -1,19 +1,35 @@
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Tony
+ * 
+ * This class is the game board of the Pentago game. It is where
+ * the state of the board is held, pieces are placed, future
+ * placements are looked into, and heuristic scores are tallied
+ * up.  
+ */
 public class GameBoard {
-	
-	char myState[][];
-	int myHeuristic;
-	boolean isGameOver;
-	private String previousMove;
+	char myState[][];			//the current state of the game board
+	int myHeuristic;			//the heuristic score of current player
+	boolean isGameOver;				
+	private String previousMove;	
 	public char player1color;
 	public char player2color;
 	
+	/**
+	 * Constructor that initializes the state of the 2D
+	 * array that is a 6x6 playing board.
+	 */
 	public GameBoard() {
 		myState = new char[6][6];
 	}
 	
+	/**
+	 * Constructor takes a 2D array as an argument in case
+	 * developer wants to construct a preset board.
+	 * @param moves
+	 */
 	public GameBoard(char[][] moves) {
 		myState = new char[6][6];
 		for (int i = 0; i < 6; i++) {
@@ -23,9 +39,11 @@ public class GameBoard {
 		}
 	}
 	
+	
 	public boolean getIsGameOver() {
 		return isGameOver;
 	}
+
 	public String getPreviousMove() {
 		return previousMove;
 	}
@@ -50,6 +68,28 @@ public class GameBoard {
 		this.player2color = player2color;
 	}
 
+	public char[][] getMyState() {
+		return myState;
+	}
+
+	public void setMyState(char[][] myState) {
+		this.myState = myState;
+	}
+
+	public int getMyHeuristic() {
+		return myHeuristic;
+	}
+
+	public void setMyHeuristic(int myHeuristic) {
+		this.myHeuristic = myHeuristic;
+	}
+	
+	/**
+	 * This method rotates one of the quadrants clockwise.  The blockNum
+	 * parameter determines which of the four quadrants gets rotated.
+	 * 
+	 * @param blockNum the quadrant that will rotate.
+	 */
 	public void rotateClockwise(int blockNum) {
 		char temp;
 		int offsetRow = 0, offsetCol = 0;
@@ -74,29 +114,39 @@ public class GameBoard {
 		
 	}
 	
+	/**
+	 * This method rotates one of the quadrants counter-clockwise. The
+	 * blockNum parameter determines which of the four quadrants gets 
+	 * rotated.
+	 * 
+	 * @param blockNum the quadrant that will rotate.
+	 */
 	public void rotateCounterClockwise(int blockNum) {
 		rotateClockwise(blockNum);
 		rotateClockwise(blockNum);
 		rotateClockwise(blockNum);
 	}
 	
-	public void placePiece(int x, int y, char pieceColor) {
-		myState[x][y] = pieceColor;
-		
-	}
-
-	public char[][] getMyState() {
-		return myState;
-	}
-
-	public void setMyState(char[][] myState) {
-		this.myState = myState;
-	}
-
+	/**
+	 * This method places a player's piece at a specific location on the
+	 * game board.  
+	 * 
+	 * @param row the row of target location.
+	 * @param col the column of target location.
+	 * @param playerColor the piece that is being placed. Either 'w' or 'b'.
+	 */
 	public void addToBoard(int row, int col, char playerColor) {
 		this.myState[row][col] = playerColor;
 	}
 	
+	/**
+	 * A method to simplify the call to rotate a quadrant of the board.
+	 * if direction is 0, block rotates counter-clockwise, otherwise, 
+	 * rotates clockwise.
+	 * 
+	 * @param block target quadrant.
+	 * @param dir direction of rotation. 0=CounterClockwise 1=Clockwise
+	 */
 	public void rotateBoard(int block, int dir) {
 		if (dir == 0) {
 			rotateCounterClockwise(block);
@@ -104,18 +154,23 @@ public class GameBoard {
 			rotateClockwise(block);
 		}
 	}
-	public int getMyHeuristic() {
-		return myHeuristic;
-	}
-
-	public void setMyHeuristic(int myHeuristic) {
-		this.myHeuristic = myHeuristic;
-	}
 	
+	/**
+	 * This method clears the current heuristic of the current player.
+	 * This applies to the heuristic of the alpha and beta players or
+	 * max/min players.
+	 */
 	public void clearHeuristic() {
 		this.myHeuristic = 0;
 	}
 	
+	/**
+	 * Method to determine whether game is over. Calls helper methods
+	 * to check whether there are 5 of one color in a row or if it is
+	 * a cat's game and no winner.
+	 * 
+	 * @return whether game is over or not.
+	 */
 	public boolean isGameOver() {
 		int countEmptySpots = 0;
 		
@@ -136,6 +191,11 @@ public class GameBoard {
 		return true;
 	}
 	
+	/**
+	 * Checks if there are 5 of one color in a row horizontally. 
+	 * 
+	 * @return whether there are 5 of one color in a horizontal row.
+	 */
 	private boolean checkHorizontal() {
 		int count = 1;
 		char previousChar = '\u0000';
@@ -158,6 +218,11 @@ public class GameBoard {
 		return false;
 	}
 	
+	/**
+	 * Checks if there are 5 of one color in a row vertically.
+	 * 
+	 * @return whether there are 5 of one color in a vertical row.
+	 */
 	private boolean checkVertical() {
 		int count = 1;
 		char previousChar = '\u0000';
@@ -180,6 +245,12 @@ public class GameBoard {
 		return false;
 	}
 	
+	/**
+	 * Checks if there are 5 of one color in a row diagonally 
+	 * (top left to bottom right)
+	 * 
+	 * @returnwhether there are 5 in a row diagonally.
+	 */
 	private boolean checkDiagnalLeft() {
 		int count = 1;
 		char previousChar = '\u0000';
@@ -218,6 +289,12 @@ public class GameBoard {
 		return false;
 	}
 	
+	/**
+	 * Checks if there are 5 of one color in a row diagonally 
+	 * (bottom right to top left)
+	 * 
+	 * @returnwhether there are 5 in a row diagonally.
+	 */
 	private boolean checkDiagnalRight() {
 		int count = 1;
 		char previousChar = '\u0000';
@@ -257,6 +334,14 @@ public class GameBoard {
 	}
 	
 	
+	/**
+	 * Determines whether the target location is occupied by another
+	 * piece or if it is empty.
+	 * 
+	 * @param row row of target location.
+	 * @param col column of target location.
+	 * @return whether the spot is occupied or not.
+	 */
 	public boolean isValidMove(int row, int col) {
 		if (myState[row][col] == '\u0000') {
 			return true;
@@ -265,6 +350,16 @@ public class GameBoard {
 		
 	}
 	
+	/**
+	 * The string that is input by the user describes a which quadrant
+	 * and which spot in that quadrant the piece will be placed. This 
+	 * method translates the move into a pair of coordinates that point
+	 * to a location on the entire 6x6 board. 
+	 * 
+	 * @param block the quadrant of placed piece.
+	 * @param position the position in the quadrant.
+	 * @return returns the player's move in coordinate format.
+	 */
 	public int[] translateMove(int block, int position) {
 		int row = 0, col = 0;
 		int[] newMove = new int[2];
@@ -288,6 +383,15 @@ public class GameBoard {
 		return newMove;
 	}
 	
+	/**
+	 * This method translates from the coordinate format to the same
+	 * format in which the user inputs their move (quadrant, spot
+	 * in quadrant).
+	 * 
+	 * @param row the row of target location.
+	 * @param col the column of target location.
+	 * @return returns the coordinates in user input format.
+	 */
 	public int[] reverseTranslate(int row, int col) {
 		int block = 0, position = 0;
 		int [] newMove = new int[2];
@@ -311,6 +415,12 @@ public class GameBoard {
 		return newMove;
 	}
 	
+	/**
+	 * Translates the direction from Left/Right to 0/1. 
+	 * 
+	 * @param theMove the move in user input format.
+	 * @return returns the direction in numerical format.
+	 */
 	public int getDirection (String theMove) {
 		char direction = theMove.charAt(5);
 		if (direction != 'R' || direction != 'r' ) {
@@ -320,10 +430,25 @@ public class GameBoard {
 		}
 	}
 	
+	/**
+	 * This method extracts the character in the user input
+	 * string that determines which block will get rotated or
+	 * receive a piece placement and turns it into an integer.
+	 * 
+	 * @param theMove the user input format of the move.
+	 * @return the integer format of the block number.
+	 */
 	public int getBlockToRotate(String theMove) {
 		return theMove.charAt(4) - '0';
 	}
 	
+	/**
+	 * This method determines whether the user input string
+	 * uses valid syntax.
+	 * 
+	 * @param theMove the user input string.
+	 * @return whether or not the string has valid syntax as a move.
+	 */
 	public boolean isValidSyntax(String theMove) {
 		boolean validSyntax = true;
 		int blockPlacement = 0;
@@ -333,7 +458,6 @@ public class GameBoard {
 		int[] newMove = new int[2];
 		
 		try {
-
 			blockPlacement = theMove.charAt(0) - '0';
 			position = theMove.charAt(2) - '0';
 			blockToRotate = getBlockToRotate(theMove);
@@ -359,22 +483,26 @@ public class GameBoard {
 		return false;
 	}
 	
+	/**
+	 * Executes the move by setting the target location on the
+	 * gameboard to the color in the argument.
+	 * 
+	 * @param row the row of the target location.
+	 * @param col the column of the target location.
+	 * @param color the color of the current player's piece.
+	 */
 	public void performMove(int row, int col, char color) {
 		myState[row][col] = color;
 		
 	}
 	
-	//dir:  0 = left, 1 = right
-	//block:   the block to rotate 1-4
-	public void performRotate(int dir, int block) {
-		if (dir == 1) {
-			rotateClockwise(block);
-		} else {
-			rotateCounterClockwise(block);
-		}
-	}
-	
-	
+	/**
+	 * This is the method that retrieves the future possibilities of
+	 * the game board.
+	 * 
+	 * @param isCurrentPlayer2 whether the current player is alpha or not.
+	 * @return returns a list of future move coordinates.
+	 */
 	public List<int[]> getChildren(boolean isCurrentPlayer2) {
 		List<int[]> nextMoves = new ArrayList<int[]>();
 		
@@ -399,6 +527,11 @@ public class GameBoard {
 		return nextMoves;
 	}
 	
+	/**
+	 * This method prints an ascii version of the gameboard state.
+	 * white players are marked as 'w' and black players are marked
+	 * as 'b'. blank spaces are just just blank characters (aka. '\u0000').
+	 */
 	public void displayGameBoard() {
 		char temp[][] = myState;
 		for (int i = 0; i < 6; i++) {
@@ -425,6 +558,13 @@ public class GameBoard {
 	}
 
 
+	/**
+	 * An equals method to determine whether two gameboards
+	 * have identical states.
+	 * 
+	 * @param theGameBoard the gameboard that will be compared to this.gamebaord.
+	 * @return whether the gameboard states are identical or not.
+	 */
 	public boolean equals(GameBoard theGameBoard) {
 		if ((theGameBoard.myState).equals(this.myState)) {
 			return true;
@@ -432,8 +572,13 @@ public class GameBoard {
 		return false;
 	}
 
-	
-	//adds up heuristic: available spots left + points for how many pieces they have in a row.
+	/**
+	 * Adds up the heuristic: available spots left + points for how many
+	 * pieces the player has in a row.
+	 * 
+	 * @param isAlphaPlayer whether the player in question is alpha.
+	 * @return the heuristic score.
+	 */
 	public int getHeuristicValue(boolean isAlphaPlayer) {
 		char previousChar = '$';
 		char currentChar = '\u0000';
@@ -582,6 +727,16 @@ public class GameBoard {
 		return (numAvailableWinningSpots + myHeuristic);
 	}
 	
+	/**
+	 * Helper function for the getHeuristicValue to count how many pieces
+	 * the player in question has in a row. This method also determines
+	 * the point value given to 2, 3, 4, 5 pieces of one color in a row.
+	 * 
+	 * @param currentChar the current character.
+	 * @param previousChar the previous character.
+	 * @param count the count of how many of one character is in a row.
+	 * @param isAlphaPlayer whether the current player is alpha or not.
+	 */
 	public void countNumInArow(char currentChar, char previousChar, int count, boolean isAlphaPlayer) {
 		if (isAlphaPlayer) {
 			if (count == 5 && player2color == currentChar) {
@@ -626,27 +781,4 @@ public class GameBoard {
 		}
 		
 	}
-	
-	public List<int[]> generateMoves() {
-      List<int[]> nextMoves = new ArrayList<int[]>(); // allocate List
- 
-      // If gameover, i.e., no next move
-      if (isGameOver()) {
-         return nextMoves;   // return empty list
-      }
- 
-      // Search for empty cells and add to the List
-      for (int l = 0; l < 2; l++) {
-    	 for (int k = 0; k < 4; k++) {
-    		 for (int row = 0; row < 6; ++row) {
-    			 for (int col = 0; col < 6; ++col) {
-    				 if (myState[row][col] == '\u0000') {
-    					 nextMoves.add(new int[] {row, col});
-    				 }
-    			 }
-    		 }
-    	 }
-      }
-      return nextMoves;
-   }
 }

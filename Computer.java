@@ -1,19 +1,41 @@
 import java.util.List;
 
+/**
+ * @author Tony
+ *
+ * This class is the artifical-intelligence that will be
+ * playing against the human. Since it is random who goes
+ * first, the AI is not always going to be alpha/max or the
+ * beta/min player and same goes with the human.  
+ */
 public class Computer {
 
-	public int nodesExpanded;
-	private GameBoard gameBoard;
-	
-	public Computer() {
+	public int nodesExpanded;		//Number of nodes expanded.
+	private GameBoard gameBoard;	//the state of the current gameboard.
 		
+	public Computer() {
+		//Default constructor
 	}
 	
 	public GameBoard getBoard() {
 		return gameBoard;
 	}
 	
-	public int[] alphaBetaPrun(int depth, GameBoard gameBoard, boolean alphaPlayer, int alpha, int beta) {
+	/**
+	 * The alpha-beta-pruning algorithm that the AI will follow
+	 * to play the best move possible against the human. The
+	 * strength of the AI depends on the depth which is the 
+	 * number of moves that the computer can foresee.
+	 * 
+	 * @param depth number of moves that the computer can foresee.
+	 * @param gameBoard the future gameboard states.
+	 * @param alphaPlayer whether the AI is an alpha player.
+	 * @param alpha the heuristic score of alpha player.
+	 * @param beta the heuristic score of beta player.
+	 * @return returns the coordinates of intelligent move.
+	 */
+	public int[] alphaBetaPrun(int depth, GameBoard gameBoard,
+					boolean alphaPlayer, int alpha, int beta) {
 		int heuristicValue = 0;
 		int bestRow = -1;
 		int bestCol = -1;
@@ -23,7 +45,6 @@ public class Computer {
 		int compCount = 1;
 		int humCount = 1;
 		List<int[]> nextMoves = gameBoard.getChildren(alphaPlayer);
-		
 		
 		if(depth == 0 || nextMoves.isEmpty()) {
 			nodesExpanded++;
@@ -95,6 +116,16 @@ public class Computer {
 	       }
 	}
 	
+	/**
+	 * The min-max algorithm that the AI will follow to find the
+	 * best possible move against the human. The strength of the
+	 * AI move will depend on the depth.
+	 * 
+	 * @param depth number of moves that the computer can foresee.
+	 * @param gameBoard future states of the gameboard.
+	 * @param alphaPlayer whether the AI is alpha or beta player.
+	 * @return returns the coordinates of intelligent move.
+	 */
 	public int[] minMax(int depth, GameBoard gameBoard, boolean alphaPlayer) {
 		int heuristicValue = 0;
 		int bestValue = 0;
@@ -106,7 +137,6 @@ public class Computer {
 		int compCount = 1;
 		int humCount = 1;
 		List<int[]> nextMoves = gameBoard.getChildren(alphaPlayer);
-		
 		
 		if(depth == 0 || nextMoves.isEmpty()) {
 			nodesExpanded++;
@@ -175,6 +205,4 @@ public class Computer {
 	         }
 		}
 	}
-	
-	
 }
